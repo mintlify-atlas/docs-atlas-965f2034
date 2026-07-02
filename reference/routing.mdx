@@ -1,5 +1,5 @@
 ---
-title: "React Router v7 Route Configuration"
+title: "Routing — React Router v7 App Route Configuration"
 sidebarTitle: "Routing"
 description: "Fundamentos React uses React Router v7 with BrowserRouter and nested routes. Each concept maps to a distinct path rendered inside the LandingPage Outlet."
 ---
@@ -62,6 +62,10 @@ export default App
 | `/zustand` | `Septimo` | Zustand |
 | `/rederizado` | `Noveno` | Conditional & List Rendering |
 | `/localStorage` | `Decimo` | `localStorage` |
+
+<Note>
+  The `localStorage` route is registered in `App.jsx` as `path="localStorage"` (capital L), but the `<Link>` in `LandingPage` points to `'/localstorage'` (all lowercase). Because `BrowserRouter` performs case-sensitive path matching, this mismatch means the active-link highlight for the localStorage entry never fires. If you need the highlight to work, change the `<Link to='/localstorage'>` in `LandingPage.jsx` to `<Link to='/localStorage'>` to match the registered route path.
+</Note>
 
 ## Layout component
 

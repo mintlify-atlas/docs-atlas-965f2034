@@ -1,7 +1,7 @@
 ---
 title: "Persisting Browser Data with localStorage and React"
 sidebarTitle: "localStorage"
-description: "localStorage stores key-value string data in the browser across sessions. Learn how to combine it with useState and useEffect to persist user data in React."
+description: "localStorage stores key-value strings in the browser across sessions. Learn how to combine it with useState and useEffect to persist user data in React."
 ---
 
 `localStorage` is a synchronous browser API that lets you store key-value pairs that survive page reloads and even full browser restarts. Unlike React state, which resets every time a component unmounts, data written to `localStorage` stays available until it is explicitly removed or the user clears their browser storage. The challenge is bridging the two worlds: React's reactive state system and the imperative `localStorage` API. The typical pattern combines `useEffect` to write data at the right lifecycle moment and a plain function (or another `useEffect`) to read it back into state on demand.

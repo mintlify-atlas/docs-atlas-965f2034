@@ -1,5 +1,5 @@
 ---
-title: "Managing Component State with useState"
+title: "Managing React Component State with the useState Hook"
 sidebarTitle: "useState"
 description: "useState is React's core state hook. Learn the hook signature, how state updates trigger re-renders, and see a counter demo from the source."
 ---
@@ -8,10 +8,10 @@ description: "useState is React's core state hook. Learn the hook signature, how
 
 ## Hook signature
 
-`useState` accepts an initial value and returns a two-element tuple: the current state value and a setter function. The generic type parameter `T` is inferred automatically by TypeScript from the initial value you provide.
+`useState` accepts an initial value and returns a two-element array: the current state value and a setter function. JavaScript destructuring lets you name both elements in a single declaration.
 
-```tsx
-const [state, setState] = useState<T>(initialValue)
+```jsx
+const [state, setState] = useState(initialValue)
 ```
 
 - `state` — the current value for this render.
@@ -23,6 +23,7 @@ const [state, setState] = useState<T>(initialValue)
 The `Segundo` component from the project implements a classic like-counter with three controls: increment, reset, and decrement. It uses a single `useState` call to manage the count.
 
 ```jsx
+
 /*
 
   1- useState

@@ -1,5 +1,5 @@
 ---
-title: "Running Side Effects with useEffect"
+title: "Running Side Effects in React with the useEffect Hook"
 sidebarTitle: "useEffect"
 description: "useEffect runs code after render — perfect for API calls, subscriptions, and DOM updates. Learn how dependency arrays control when effects fire."
 ---
@@ -8,7 +8,7 @@ A **side effect** is any operation that reaches outside the pure render cycle �
 
 ## Hook signature
 
-```tsx
+```jsx
 useEffect(() => {
   // effect
   return () => { /* cleanup */ }
@@ -32,6 +32,7 @@ useEffect(() => {
 The `Tercero` component fetches a random user from the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API and displays their profile. The state variable `buscar` acts as a manual trigger: placing it in the dependency array means the effect re-runs — and a fresh random user is fetched — every time `buscar` changes. Because the demo currently mounts with `buscar` set to `1` and never calls `setBuscar`, the fetch fires exactly once on mount. Extending the UI with a "Buscar otro" button that increments `buscar` would immediately trigger another fetch without any extra wiring.
 
 ```jsx
+
 /*
 
   1- useEffect

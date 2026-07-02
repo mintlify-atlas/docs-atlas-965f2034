@@ -1,7 +1,7 @@
 ---
-title: "Building Reusable Logic with Custom Hooks"
+title: "Building Reusable Logic with Custom Hooks in React"
 sidebarTitle: "Custom Hooks"
-description: "Custom hooks encapsulate stateful logic so any component can reuse it. Learn how useFetch wraps the Fetch API and returns an async function you call anywhere."
+description: "Custom hooks encapsulate reusable logic outside components. Learn how useFetch wraps the Fetch API and returns an async function you can call anywhere."
 ---
 
 Custom hooks are JavaScript functions whose names start with `use` and that can call other React hooks internally. They let you extract stateful or side-effectful logic out of individual components and share that logic across your entire application without changing the component tree. Instead of duplicating a `fetch` call — with its own loading state, error handling, and `useEffect` — in every component that needs remote data, you write the logic once inside a custom hook and import it wherever it is needed.
