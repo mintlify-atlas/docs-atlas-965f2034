@@ -1,0 +1,83 @@
+---
+title: "Managing Component State with useState"
+sidebarTitle: "useState"
+description: "useState is React's core state hook. Learn the hook signature, how state updates trigger re-renders, and see a counter demo from the source."
+---
+
+`useState` is React's foundational state hook. It lets a function component remember a value between renders and, crucially, tells React to re-render the component whenever that value changes. Before hooks existed, only class components could hold local state; `useState` brings the same capability to any function component with a single line of code. Every piece of interactive UI you build in React — counters, form inputs, toggles, fetched data — will rely on `useState` at some level.
+
+## Hook signature
+
+`useState` accepts an initial value and returns a two-element tuple: the current state value and a setter function. The generic type parameter `T` is inferred automatically by TypeScript from the initial value you provide.
+
+```tsx
+const [state, setState] = useState<T>(initialValue)
+```
+
+- `state` — the current value for this render.
+- `setState` — call this to schedule a state update; React will re-render the component with the new value.
+- `initialValue` — used only on the **first** render; ignored on all subsequent renders.
+
+## Counter demo
+
+The `Segundo` component from the project implements a classic like-counter with three controls: increment, reset, and decrement. It uses a single `useState` call to manage the count.
+
+```jsx
+/*
+
+  1- useState
+
+*/
+
+
+import { useState } from "react"
+
+const Segundo = () => {
+
+  const [counter, setCounter] = useState(0)
+
+  const handleReset = () =>
+  {
+    setCounter(0)
+  }
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">useState</h1>
+      
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+          Es un Hook que permite manejar el estado dentro de un componente.
+        </li>
+      </ul>
+        
+        <div className="text-center mb-8">
+        
+          <h2 className="mt-4 mb-4">Likes del vídeo: {counter}</h2>
+        
+          <button className="bg-green-700 text-white py-1 px-3 mx-1 rounded" onClick={()=>setCounter(counter + 1)}>Aumentar</button>
+          
+          <button className="bg-red-700 text-white py-1 px-3 mx-1 rounded" onClick={handleReset}>Resetar</button>
+        
+          <button className="bg-blue-700 text-white py-1 px-3 rounded" onClick={()=>{setCounter(counter-1)}}>Disminuir</button>
+        
+        </div>
+    </>
+  )
+}
+
+export default Segundo
+```
+
+## How it works
+
+- **Initial value** — `useState(0)` sets `counter` to `0` the first time `Segundo` mounts. React stores this value internally and ignores the argument on every subsequent render.
+- **Setter function** — `setCounter` is the only way to update `counter`. Calling `setCounter(counter + 1)` schedules a re-render with the new value; React batches multiple calls within the same event handler before committing a single update.
+- **Re-render on state change** — each time `setCounter` is called with a value that differs from the current one, React re-renders `Segundo` and the JSX reflects the updated `counter`.
+- **Functional updates pattern** — when the next state depends on the previous state, pass an updater function instead of a value: `setCounter(prev => prev + 1)`. This guarantees you read the most recent state even if multiple updates are batched together, and is especially important inside async callbacks or event handlers that close over a stale value.
+
+<Note>
+  Calling the setter with the **same value** as the current state does **not** trigger a re-render. React uses `Object.is` to compare the old and new values. For primitives like numbers and strings this works exactly as you would expect. For objects and arrays, `Object.is` checks reference equality — so mutating an object in place and passing the same reference will not schedule a re-render. Always create a new object or array when updating state that holds a non-primitive value.
+</Note>

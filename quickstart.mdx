@@ -1,47 +1,115 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with Fundamentos React"
+sidebarTitle: "Quickstart"
+description: "Clone the Fundamentos React repo, install dependencies, and launch the Vite dev server to explore interactive React concept demos in under two minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+In this guide you'll get Fundamentos React running on your local machine. Once the dev server is up you'll have an interactive, sidebar-driven app that walks through core React concepts — components and JSX, `useState`, `useEffect`, custom hooks, props, Zustand global state, conditional rendering, and `localStorage` persistence — each on its own dedicated route.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
+
+  <Step title="Clone the repository">
+    Clone the project from GitHub and move into the project directory.
 
     ```bash
-    npm install your-package
+    git clone https://github.com/Byrontosh/FundamentosReact.git && cd FundamentosReact
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+
+  <Step title="Install dependencies">
+    Install all required packages using your preferred package manager.
+
+    <CodeGroup>
+
+      ```bash npm
+      npm install
+      ```
+
+      ```bash yarn
+      yarn install
+      ```
+
+      ```bash pnpm
+      pnpm install
+      ```
+
+    </CodeGroup>
+
+    <Tip>
+      The project uses **React 18**, **React Router v7**, **Zustand v5**, and **Tailwind CSS v4** (loaded via the `@tailwindcss/vite` plugin). All are listed in `package.json` and will be resolved in one install step.
+    </Tip>
+  </Step>
+
+  <Step title="Start the dev server">
+    Launch the Vite development server.
 
     ```bash
-    your-cli init
+    npm run dev
     ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
 
-    ```bash
-    your-cli start
+    Vite will start and print a local URL. Open it in your browser:
+
     ```
+    http://localhost:5173
+    ```
+
+    Hot module replacement (HMR) is enabled by default — changes to any source file are reflected in the browser instantly without a full reload.
   </Step>
+
+  <Step title="Navigate the app">
+    Once the app loads you'll land on the **Fundamentos** page. A sidebar on the left lists every concept covered by the project. Click any link to jump directly to that topic's interactive demo page.
+
+    | Sidebar link | Route | Concept covered |
+    |---|---|---|
+    | Fundamentos | `/fundamentos` | React components & JSX basics |
+    | useState | `/usestate` | Local state with `useState` |
+    | useEffect | `/useffect` | Side effects with `useEffect` |
+    | Custom Hook | `/customhook` | Extracting logic into custom hooks |
+    | Props | `/props` | Passing data between components |
+    | Zustand | `/zustand` | Global state management with Zustand v5 |
+    | Renderizado | `/rederizado` | Conditional & list rendering |
+    | localStorage | `/localStorage` | Persisting state with the Web Storage API |
+
+    Each page contains live, editable examples so you can experiment directly in the browser.
+  </Step>
+
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Available scripts
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+The following scripts are defined in `package.json` and can be run from the project root.
+
+| Script | Command | Description |
+|---|---|---|
+| Dev server | `npm run dev` | Starts the Vite development server on `http://localhost:5173` with HMR enabled. |
+| Production build | `npm run build` | Bundles the app for production into the `dist/` directory. |
+| Preview build | `npm run preview` | Serves the production build locally so you can verify the output before deploying. |
+
+## Project entry point
+
+The application mounts from `src/index.jsx`. It wraps the root `<App />` component in `React.StrictMode` and attaches it to the `#root` `<div>` declared in `index.html`.
+
+```jsx src/index.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+```
+
+<Note>
+  This project was originally scaffolded on **Replit**. As a result, `vite.config.js` contains a `server.allowedHosts` entry pointing to a Replit preview URL:
+
+  ```js vite.config.js
+  server: {
+    allowedHosts: ['98e93ea5-9538-4ff9-9373-c75809af2597-00-3tonq8itozctu.picard.replit.dev']
+  }
+  ```
+
+  This entry is harmless but unnecessary when running locally. You can safely remove the entire `server` block from `vite.config.js` if you want a clean local config.
+</Note>

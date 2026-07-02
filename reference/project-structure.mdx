@@ -1,0 +1,151 @@
+---
+title: "Fundamentos React Project Structure Explained"
+sidebarTitle: "Project Structure"
+description: "A walkthrough of every file and directory in Fundamentos React — from the Vite entry point to the page components and the Zustand context store."
+---
+
+Fundamentos React follows a straightforward Vite + React layout. The project root holds the four configuration files that Vite, TypeScript, and the package manager need, while all application source code lives under `src/`. Inside `src/` the code is organized into four focused subdirectories — `context/`, `customHook/`, and `pages/` — each responsible for a distinct layer of the app.
+
+## Directory tree
+
+```
+FundamentosReact/
+├── index.html
+├── package.json
+├── vite.config.js
+├── tsconfig.json
+├── public/
+│   └── favicon.svg
+└── src/
+    ├── App.jsx
+    ├── index.jsx
+    ├── index.css
+    ├── context/
+    │   └── storeGalleta.jsx
+    ├── customHook/
+    │   └── useFecth.js
+    └── pages/
+        ├── LandingPage.jsx
+        ├── Primero.jsx
+        ├── Segundo.jsx
+        ├── Tercero.jsx
+        ├── Cuarto.jsx
+        ├── Quinto.jsx
+        ├── Sexto.jsx
+        ├── Septimo.jsx
+        ├── Octavo.jsx
+        ├── Noveno.jsx
+        └── Decimo.jsx
+```
+
+## Root files
+
+The root of the repository contains only the files that tooling requires. No application logic lives here.
+
+| File | Purpose |
+|---|---|
+| `index.html` | Vite's HTML entry point. Defines the `<div id="root">` mount target and loads `/src/index.jsx` as an ES module. |
+| `package.json` | Declares the project name (`react-javascript`), npm scripts (`dev`, `build`, `preview`), and all runtime and dev dependencies. |
+| `vite.config.js` | Registers the `@vitejs/plugin-react` and `@tailwindcss/vite` plugins and configures the development server's `allowedHosts`. |
+| `tsconfig.json` | TypeScript compiler options targeting `ESNext` with strict mode enabled. The `jsx` option is set to `react-jsx`, and the `include` field targets the `src/` directory. |
+
+## src/
+
+The `src/` directory contains every file that ends up in the final bundle. The four top-level files handle bootstrapping, while the subdirectories group code by responsibility.
+
+### `src/index.jsx`
+
+This is the React DOM entry point. It imports `ReactDOM` from `react-dom/client`, selects the `#root` element injected by `index.html`, and mounts the root `<App />` component wrapped in `<React.StrictMode>`:
+
+```jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+```
+
+### `src/App.jsx`
+
+`App.jsx` defines the entire client-side route tree using React Router's `<BrowserRouter>`, `<Routes>`, and `<Route>` components. `LandingPage` acts as the persistent shell layout mounted at `/`, and each concept page is registered as a nested child route:
+
+```jsx
+import { BrowserRouter, Routes, Route } from "react-router";
+import LandingPage from "./pages/LandingPage";
+// ...page imports
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />}>
+          <Route index element={<Primero />} />
+          <Route path="fundamentos"   element={<Primero />} />
+          <Route path="usestate"      element={<Segundo />} />
+          <Route path="useffect"      element={<Tercero />} />
+          <Route path="customhook"    element={<Cuarto />} />
+          <Route path="props"         element={<Quinto />} />
+          <Route path="zustand"       element={<Septimo />} />
+          <Route path="rederizado"    element={<Noveno />} />
+          <Route path="localStorage"  element={<Decimo />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
+```
+
+### `src/index.css`
+
+A minimal global stylesheet. Its single line imports the full Tailwind CSS utility set via the v4 `@import` directive:
+
+```css
+@import "tailwindcss";
+```
+
+No custom base styles or component overrides are defined here — all styling is done with Tailwind utility classes directly in the JSX.
+
+### `src/context/`
+
+Contains Zustand store definitions. The single file `storeGalleta.jsx` creates and exports a global store used by the Zustand concept page. Keeping stores in a dedicated `context/` folder makes it easy to scale to multiple stores as the app grows.
+
+### `src/customHook/`
+
+Houses project-level custom hooks. `useFecth.js` is a reusable data-fetching hook that encapsulates `fetch` calls, loading state, and error handling — demonstrated on the custom hook concept page.
+
+### `src/pages/`
+
+One component file per interactive concept lesson, plus the `LandingPage` shell. See the naming convention table below for the full mapping.
+
+## src/pages/ naming convention
+
+Each page component is named after a Spanish ordinal number. The table below maps each component to the React concept it teaches, along with its registered URL path.
+
+| Component | URL path | Concept covered |
+|---|---|---|
+| `LandingPage.jsx` | `/` | Persistent navigation shell and layout wrapper |
+| `Primero.jsx` | `/fundamentos` | React fundamentals — components, JSX, and rendering |
+| `Segundo.jsx` | `/usestate` | The `useState` hook and local component state |
+| `Tercero.jsx` | `/useffect` | The `useEffect` hook and side effects |
+| `Cuarto.jsx` | `/customhook` | Building and consuming custom hooks (`useFecth`) |
+| `Quinto.jsx` | `/props` | Passing data with props (renders `Sexto` as a child) |
+| `Sexto.jsx` | — | Child component rendered by `Quinto` to demonstrate prop passing |
+| `Septimo.jsx` | `/zustand` | Global state management with Zustand (renders `Octavo` as a child) |
+| `Octavo.jsx` | — | Child component rendered by `Septimo` to demonstrate shared Zustand state |
+| `Noveno.jsx` | `/rederizado` | Conditional rendering and list rendering |
+| `Decimo.jsx` | `/localStorage` | Persisting state with `localStorage` |
+
+<Note>
+  The project uses `.jsx` file extensions throughout, even though TypeScript is
+  configured in `tsconfig.json` with `"strict": true` and `"jsx": "react-jsx"`.
+  You can rename any file from `.jsx` to `.tsx` at any time to enable full
+  static type checking for that component — the rest of the build pipeline
+  requires no changes.
+</Note>

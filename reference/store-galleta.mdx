@@ -1,0 +1,69 @@
+---
+title: "storeGalleta — Zustand Store Reference"
+sidebarTitle: "storeGalleta"
+description: "storeGalleta is a Zustand store holding a cookie's nombre and tipo. Any component can read detalle or dispatch setGalleta without a provider."
+---
+
+`storeGalleta` is a Zustand store created with `create` that holds the state for a simple cookie ("galleta") demo used in the Zustand concept page of Fundamentos React. It stores a single `detalle` object describing a cookie by its `nombre` (name) and `tipo` (type), and exposes one action — `setGalleta` — that replaces the entire `detalle` object with a new value. Because the store is defined at module level, any component in the application can subscribe to it and dispatch updates without wrapping the tree in a context provider.
+
+## Import
+
+```js
+import storeGalleta from '../context/storeGalleta'
+```
+
+## Store shape
+
+<ResponseField name="detalle" type="object">
+  The currently stored cookie descriptor. Contains two string fields:
+
+  - **`nombre`** `string` — The cookie's name. Initial value: `'Nucita'`.
+  - **`tipo`** `string` — The cookie's type or category. Initial value: `'galleta'`.
+
+  Initial value of the full object: `{ nombre: 'Nucita', tipo: 'galleta' }`.
+</ResponseField>
+
+<ResponseField name="setGalleta" type="function">
+  Action that replaces `detalle` with a new object. Accepts a single argument — a plain object with `nombre` and `tipo` string properties — and calls Zustand's `set` to update the store.
+
+  **Signature:** `(newGalleta: { nombre: string; tipo: string }) => void`
+</ResponseField>
+
+## Full source
+
+```jsx
+import { create } from "zustand";
+
+
+const storeGalleta = create((set)=>({
+    
+    detalle:{
+        nombre: "Nucita",
+        tipo: "galleta",
+    },
+    
+    setGalleta: (newGalleta) => set({ detalle: newGalleta })
+    
+}))
+
+
+export default storeGalleta
+```
+
+## Usage
+
+Call `storeGalleta()` inside any functional component to destructure the state and action you need. Zustand re-renders only the components that subscribe to the slice of state they use.
+
+```jsx
+const { detalle, setGalleta } = storeGalleta()
+
+// read
+console.log(detalle.nombre) // 'Nucita'
+
+// update
+setGalleta({ nombre: 'BIMBO', tipo: 'Ponkey' })
+```
+
+<Note>
+  Because Zustand stores are module-level singletons, `storeGalleta` does not require a `<Provider>` wrapper anywhere in the component tree. Simply import the store and call it as a hook from any component — reads and writes are automatically shared across all subscribers.
+</Note>

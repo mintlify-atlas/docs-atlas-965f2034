@@ -1,0 +1,167 @@
+---
+title: "Conditional Rendering and List Rendering in React"
+sidebarTitle: "Rendering"
+description: "React lets you conditionally show UI with ternary expressions and render lists from arrays with .map(). Learn both patterns from the Noveno component."
+---
+
+Two of the most common patterns in any React application are deciding **what** to render based on runtime state, and turning an **array of data** into a list of elements. React handles both inside the same JSX syntax you already use for static markup: a JavaScript ternary expression controls which branch of UI appears, while `Array.prototype.map()` converts each item in an array into a corresponding JSX node. The `Noveno` component demonstrates both techniques together in a single, focused example.
+
+## Conditional rendering
+
+Conditional rendering lets you display different UI branches depending on a boolean value, a piece of state, or any JavaScript expression that evaluates to truthy or falsy. The most readable way to write this in JSX is the **ternary operator**: `condition ? <TrueUI /> : <FalseUI />`.
+
+In `Noveno.jsx`, a `login` boolean tracks whether the user has authenticated. The ternary reads `login`, and shows a welcome message when `true` or a prompt to sign in when `false`. A button toggles `login` with `setLogin(!login)`, which immediately causes React to re-render the correct branch.
+
+```jsx
+const [login, setLogin] = useState(false)
+
+{login 
+  ? 
+(
+  <p>¡Bienvenido de nuevo! 😎 </p>
+) 
+  : 
+(
+ <p>Por favor, inicia sesión</p>
+)}
+
+<button className="mt-2 bg-blue-600 text-white py-1 px-3 rounded" onClick={() => setLogin(!login)}>
+  {login ? "Cerrar sesión" : "Iniciar sesión"}
+</button>
+```
+
+The button label also uses a ternary inline — `login ? "Cerrar sesión" : "Iniciar sesión"` — demonstrating that the same pattern applies to prop values, not just whole JSX subtrees.
+
+## List rendering
+
+When you have an array of items and want to display each one as a UI element, use `Array.prototype.map()` inside JSX. The callback receives each item and must return a JSX node. React requires each node returned by `map` to have a **`key` prop**: a stable, unique string or number that lets React identify which items have changed, been added, or been removed during re-renders.
+
+In `Noveno.jsx`, `habilidades` is an array of skill objects. Each object is mapped to a `<li>` element using the array index as the key:
+
+```jsx
+const [habilidades] = useState([
+  { nombre: "HTML", icono: "📙" },
+  { nombre: "CSS", icono: "📘" },
+  { nombre: "JavaScript", icono: "📒" },
+  { nombre: "React", icono: "⚛️" },
+  { nombre: "Node.js", icono: "📗" },
+])
+
+<ul className="list-disc pl-5 text-left">
+  
+  {habilidades.map((habilidad, index) => (
+
+    <li key={index}>{habilidad.icono} - {habilidad.nombre}</li>
+
+  ))}
+
+</ul>
+```
+
+Each `<li>` receives `key={index}` so React can reconcile the list efficiently. The `icono` and `nombre` fields are interpolated directly inside the element content.
+
+## Full component
+
+Below is the complete `Noveno.jsx` source, showing both patterns together as they appear in the running application.
+
+```jsx
+/*
+
+  1- Rederizado condicional
+  2- Renderizado de listas
+
+*/
+
+import { useState } from "react"
+
+
+
+const Noveno = () => {
+
+  const [login, setLogin] = useState(false)
+  const [habilidades] = useState([
+    { nombre: "HTML", icono: "📙" },
+    { nombre: "CSS", icono: "📘" },
+    { nombre: "JavaScript", icono: "📒" },
+    { nombre: "React", icono: "⚛️" },
+    { nombre: "Node.js", icono: "📗" },
+  ])
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">Renderizado</h1>
+
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+        <strong>Renderizado condicional:</strong> Permite mostrar u ocultar elementos de la interfaz según ciertas condiciones.
+        </li>
+        <li>
+          <strong>Renderizado de listas:</strong> Permite mostrar múltiples elementos a partir de un array usando métodos de los arreglos.
+        </li>
+      </ul>
+
+      <div className="flex justify-center mb-8 mt-8">
+        <div className="border rounded-lg p-4 w-120 mx-auto text-center">
+          
+          <h2 className="text-1xl font-bold text-left underline mb-4">Condicional</h2>
+
+          {login 
+            ? 
+          (
+            <p>¡Bienvenido de nuevo! 😎 </p>
+          ) 
+            : 
+          (
+           <p>Por favor, inicia sesión</p>
+          )}
+
+          <button className="mt-2 bg-blue-600 text-white py-1 px-3 rounded" onClick={() => setLogin(!login)}>
+            {login ? "Cerrar sesión" : "Iniciar sesión"}
+          </button>
+
+        </div>
+
+      </div>
+
+      <div className="flex justify-center mb-8">
+
+        <div className=" border rounded-lg p-4 w-120 mx-auto text-center">
+
+          <h2 className="text-1xl font-bold text-left underline mb-4">Listas</h2>
+          
+            <ul className="list-disc pl-5 text-left">
+              
+              {habilidades.map((habilidad, index) => (
+      
+                <li key={index}>{habilidad.icono} - {habilidad.nombre}</li>
+      
+              ))}
+            
+            </ul>
+          
+        </div>
+
+      </div>
+
+    </>
+  )
+  }
+
+export default Noveno
+```
+
+<Warning>
+Using the **array index as a `key`** is acceptable when the list is static and will never be reordered, filtered, or have items inserted in the middle. However, if the array can change order, index-based keys tell React the wrong item changed, leading to subtle bugs such as mismatched input state, incorrect animations, or stale DOM nodes. For dynamic lists, always prefer a stable, unique identifier from your data (e.g. `item.id`) as the key.
+</Warning>
+
+<Tip>
+When you only need to render something for the **truthy** branch and want nothing for the falsy branch, the **`&&` short-circuit** operator is more concise than a full ternary:
+
+```jsx
+{isLoggedIn && <Dashboard />}
+```
+
+If `isLoggedIn` is `false`, React renders nothing. Reserve the ternary (`? :`) for cases where both branches produce visible output.
+</Tip>

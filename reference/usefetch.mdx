@@ -1,0 +1,102 @@
+---
+title: "useFetch — Custom Hook API Reference"
+sidebarTitle: "useFetch"
+description: "useFetch is a custom React hook that wraps the browser Fetch API. It returns an async function that fetches a URL and returns parsed JSON."
+---
+
+`useFetch` is a custom React hook that encapsulates reusable data-fetching logic. Instead of writing `fetch` boilerplate in every component, you call `useFetch()` once to receive `fetchDataBackend` — a ready-to-use async function. Pass any URL to that function and it will fetch the resource, parse the response as JSON, and return the result. Any network or parsing error is caught internally and logged to the console, keeping your component code clean.
+
+## Import
+
+```js
+import { useFetch } from '../customHook/useFecth'
+```
+
+## Signature
+
+```js
+function useFetch(): (url: string) => Promise<any>
+```
+
+## Parameters
+
+`useFetch` itself takes no parameters. The async function it returns accepts the following argument:
+
+<ParamField path="url" type="string" required>
+  The fully-qualified URL to fetch. The endpoint must respond with a valid JSON body; the hook calls `.json()` on the raw `Response` object.
+</ParamField>
+
+## Return value
+
+`useFetch` returns `fetchDataBackend`, an `async` function with the signature `(url: string) => Promise<any>`.
+
+When called, `fetchDataBackend`:
+
+1. Issues a `fetch(url)` request using the browser's native Fetch API.
+2. Awaits the `Response` and calls `.json()` to deserialize the body.
+3. Returns the parsed JavaScript value (object, array, primitive, etc.).
+4. On any error — network failure, non-JSON body, etc. — logs the error to the console via `console.log` and implicitly returns `undefined`.
+
+## Full source
+
+```js
+export function useFetch() {
+
+  const fetchDataBackend = async (url) => {
+    try {
+      const request = await fetch(url)
+      const response = await request.json()
+      return response      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
+  return fetchDataBackend
+}
+```
+
+## Usage example
+
+The following example is taken from `Cuarto.jsx`, the Custom Hook concept page. It demonstrates calling `useFetch` to obtain `fetchDataBackend` and using it inside two separate event handlers to load data from different APIs into local state.
+
+```jsx
+import { useState } from "react"
+import { useFetch } from "../customHook/useFecth"
+
+const Cuarto = () => {
+  
+  const [products, setProducts] = useState([])
+  const [memes, setMemes] = useState([])
+  
+  const fetchDataBackend = useFetch()
+
+  const getDataProducts = async () => {
+    const products = await fetchDataBackend("https://fakestoreapi.com/products")
+    setProducts(products)
+    console.log(products)  
+  }
+  
+  const getDataMemes = async () => {
+    const memes = await fetchDataBackend("https://api.imgflip.com/get_memes")
+    setMemes(memes)
+    console.log(memes)  
+  }
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">customHook</h1>
+      <pre>{JSON.stringify(products[3]?.title)}</pre>
+      <pre>{JSON.stringify(memes.data?.memes[0]?.name)}</pre>
+      <button onClick={getDataProducts}>Obtener Productos</button>
+      <button onClick={getDataMemes}>Obtener Memes</button>
+    </>
+  )
+}
+
+export default Cuarto
+```
+
+<Note>
+  Errors thrown during the fetch — including network failures, CORS rejections, and invalid JSON bodies — are caught by the `try/catch` block inside `fetchDataBackend` and logged to the console with `console.log(error)`. In these cases the function returns `undefined`. Your component should guard against an `undefined` result before accessing properties on the returned value.
+</Note>

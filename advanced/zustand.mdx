@@ -1,0 +1,152 @@
+---
+title: "Global State Management with Zustand"
+sidebarTitle: "Zustand"
+description: "Zustand provides a minimal global store without context providers or reducers. See how storeGalleta shares cookie data across parent and child components."
+---
+
+As a React application grows, passing state through props across many levels of the component tree — a pattern known as prop drilling — becomes cumbersome and brittle. Global state management libraries solve this by maintaining a single shared store that any component can read from or write to directly. Zustand is one of the lightest solutions available: it requires no wrapping provider, no action types, and no reducers. You define a store with `create`, export it, and call it like a hook wherever you need it.
+
+## The store
+
+`storeGalleta.jsx` defines the global store for the galleta (cookie) data. Zustand's `create` function receives a callback that has access to `set`, the primitive used to merge new values into the store, and must return an object representing the initial state and all actions.
+
+```jsx
+import { create } from "zustand";
+
+
+const storeGalleta = create((set)=>({
+    
+    detalle:{
+        nombre: "Nucita",
+        tipo: "galleta",
+    },
+    
+    setGalleta: (newGalleta) => set({ detalle: newGalleta })
+    
+}))
+
+
+export default storeGalleta
+```
+
+Key points:
+
+- **`create`** — imported directly from `zustand`, it is the only API you need to build a store. It takes a setup function and returns a custom hook (`storeGalleta`) that any component can call.
+- **`detalle`** — the initial state object, holding `nombre: "Nucita"` and `tipo: "galleta"`. Any component that subscribes to `storeGalleta` will receive this value until it is updated.
+- **`setGalleta`** — the single action in this store. It accepts a `newGalleta` object and calls `set({ detalle: newGalleta })`, which performs a shallow merge, replacing `detalle` with the new value and triggering a re-render in every subscribed component.
+
+## Reading state in a parent component
+
+`Septimo.jsx` is the parent component that renders the `Octavo` child and also reads from the same `storeGalleta` store directly.
+
+```jsx
+/*
+
+  1- Zustand 
+
+*/
+
+
+
+import storeGalleta from "../context/storeGalleta"
+import Octavo from "./Octavo"
+
+
+const Septimo = () => {
+
+  const {detalle,setGalleta} = storeGalleta()
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">Zustand </h1>
+
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+          Librería para manejar el estado global. Además, funciona como un store que cualquier componente puede usar.
+        </li>
+      </ul>
+
+
+      <h2 className="text-blue-700 text-center mt-8">Padre</h2>
+
+      <div className="border-2 border-blue-500 flex-colum justify-center items-center w-120 mx-auto mb-8">
+
+        <Octavo/>
+        
+        <p>nombre: {detalle.nombre}</p>
+        
+        <p>tipo: {detalle.tipo}</p>
+
+        <button className="bg-gray-600 text-white py-1 px-3 rounded w-full mt-4" onClick={()=>{setGalleta({nombre: "BIMBO", tipo: "Ponkey"})}}>Cambiar</button>
+
+        
+      </div>
+
+    </>
+  )
+}
+
+export default Septimo
+```
+
+`const { detalle, setGalleta } = storeGalleta()` destructures the current `detalle` value and the `setGalleta` action from the store. When the **Cambiar** button is clicked, `setGalleta` is called with a new object `{ nombre: "BIMBO", tipo: "Ponkey" }`. Because both `Septimo` and `Octavo` subscribe to the same store, both components re-render simultaneously with the updated data — no prop passing required.
+
+## Reading state in a child component
+
+`Octavo.jsx` is the child component rendered inside `Septimo`. It subscribes to `storeGalleta` independently, without receiving any props from its parent.
+
+```jsx
+/*
+
+  1- Zustand 
+
+*/
+
+import storeGalleta from "../context/storeGalleta"
+
+
+
+const Octavo = () => {
+
+  const {detalle} = storeGalleta()
+
+  return (
+    <>
+
+      <h2 className="text-purple-700">Hijo</h2>
+
+      <div className="flex justify-center mb-8">
+
+        <div className="max-w-sm border-2 border-purple-500 rounded-lg p-4 w-80 text-center">
+
+          <p>nombre: {detalle.nombre}</p>
+
+          <p>tipo: {detalle.tipo}</p>
+
+        </div>
+
+      </div>
+
+    </>
+  )
+  }
+
+export default Octavo
+```
+
+`Octavo` only destructures `detalle` — it has no need for `setGalleta` because it is a read-only display component. When `Septimo` calls `setGalleta`, Zustand notifies all subscribers, so `Octavo` receives the new `detalle` value and re-renders automatically, even though nothing was passed down through props.
+
+## Store shape
+
+The following table documents every field exposed by `storeGalleta`.
+
+| Field | Type | Description |
+|---|---|---|
+| `detalle` | `{ nombre: string, tipo: string }` | The current galleta object. Starts as `{ nombre: "Nucita", tipo: "galleta" }` and is replaced wholesale by `setGalleta`. |
+| `setGalleta` | `(newGalleta: object) => void` | Action that calls Zustand's `set` to replace `detalle` with the provided object and notify all subscribers. |
+
+<Note>
+Zustand stores are **singletons** — `create` returns a single shared hook instance that is reused across every import. You can call `storeGalleta()` in any component anywhere in the tree without wrapping your application in a `<Provider>`. This is one of Zustand's primary advantages over the React Context API, which requires a provider at or above every consumer in the component hierarchy.
+</Note>

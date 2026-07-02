@@ -1,0 +1,101 @@
+---
+title: "JSX, Fragments, Variables, and Events in React"
+sidebarTitle: "JSX & Fragments"
+description: "Learn how JSX combines HTML and JavaScript, how fragments avoid extra DOM nodes, and how to handle user events in React components."
+---
+
+JSX (JavaScript XML) is the syntax extension that makes React components feel natural to write. It lets you describe your UI using HTML-like tags directly inside JavaScript, while still giving you full access to JavaScript expressions, variables, and logic. Under the hood, Vite (and the React transform) compiles every JSX element into `React.createElement` calls, so the browser never sees a single angle bracket from your source. The `Primero` component below demonstrates five foundational concepts you will use in virtually every component you write.
+
+## Key concepts
+
+**Variable** — A regular JavaScript variable (or object) declared inside a component function holds data that can be rendered inside JSX using curly-brace interpolation `{value}`. Variables are re-evaluated on every render, making them the simplest way to derive display values from your component's state or props.
+
+**Fragment** — React requires that every component returns a single root element. Rather than wrapping siblings in a redundant `<div>`, a Fragment (`<React.Fragment>` or the shorthand `<>...</>`) groups multiple elements without adding any extra node to the real DOM. This keeps your markup clean and avoids unintended styling side-effects.
+
+**JSX** — JSX is the syntax that lets you write `<h1>Hello</h1>` inside a `.jsx` file. Curly braces `{}` act as an escape hatch back into JavaScript, allowing you to embed variables, call functions, or evaluate expressions inline. JSX is not HTML — attributes use camelCase (`className` instead of `class`, `onClick` instead of `onclick`), and every tag must be explicitly closed.
+
+**Conditional** — React does not have a special directive for conditional rendering. Instead you use plain JavaScript inside JSX: the ternary operator `condition ? a : b` is the most common pattern for inline conditionals, while `&&` is handy for rendering something only when a condition is truthy. In `Primero.jsx` the user's `rol` is compared against `"Admin"` to decide whether to display `"Administrador"` or `"Invitado"`.
+
+**Eventos** — Event handlers in React are props whose names match the DOM event name in camelCase (e.g. `onClick`, `onChange`, `onSubmit`). You pass a function reference or an inline arrow function as the value. When the event fires, React calls your handler and you can update state, navigate, or trigger any other side effect. In `Primero.jsx`, an inline arrow function on the `onClick` prop of the button calls `alert("cierre de sesion")`.
+
+## Example component
+
+The following is the complete source of `Primero.jsx` as it appears in the project. It combines all five concepts in a single, focused component.
+
+```jsx
+/*
+  
+  1- Variable
+  2- Fragment
+  3- JSX
+  4- Condicional
+  5.- Eventos
+  
+*/
+
+
+const Primero = () => {
+
+  const user = {
+    name: "Byron",
+    rol: "Admin",
+  }
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">React</h1>
+      
+      <hr className="border-gray-400 mb-8"/>
+      
+      <ul className="list-disc pl-5">
+        <li>
+          <strong>Variable:</strong>Sirve para almacenar información que luego se puede usar en un componente.
+        </li>
+        <li>
+          <strong>Fragment:</strong> Permite agrupar varios elementos sin añadir un div extra al HTML.
+        </li>
+        <li>
+          <strong>JSX:</strong> Sintaxis que combina HTML y JavaScript dentro de React.
+        </li>
+        <li>
+          <strong>Condicional:</strong> Mostrar contenido dependiendo de una condición.
+        </li>
+        <li>
+          <strong>Eventos:</strong> Permiten que la aplicación responda a las acciones del usuario (onClick, onChange, etc.).
+        </li>
+      </ul>
+
+      <div className="flex justify-center mb-8 mt-8">
+        
+        <div className="w-120 border rounded-lg p-4 w-80 text-center">
+          
+          <h2 className="text-lg font-semibold mb-2">Bienvenido(a) - {user.name}</h2>
+          
+          <p className="mb-3">{user.rol === "Admin" ? "Administrador" :"Invitado"}</p>
+          
+          <button className="bg-red-700 text-white py-1 px-3 rounded w-full" onClick={()=>{alert("cierre de sesion")}}>Salir</button>
+        
+        </div>
+      
+      </div>
+    
+    </>
+  )
+}
+
+export default Primero
+```
+
+## Concepts at a glance
+
+| Concept | What it does | Example |
+|---|---|---|
+| **Variable** | Stores data that can be interpolated inside JSX | `const user = { name: "Byron", rol: "Admin" }` → `{user.name}` |
+| **Fragment** | Groups multiple sibling elements with no extra DOM node | `<>...</>` wraps the entire component return |
+| **JSX** | Blends HTML structure with JavaScript expressions via `{}` | `<h2>Bienvenido(a) - {user.name}</h2>` |
+| **Conditional** | Renders different content based on a runtime value | `{user.rol === "Admin" ? "Administrador" : "Invitado"}` |
+| **Eventos** | Attaches a handler function to a native browser event | `onClick={() => { alert("cierre de sesion") }}` |
+
+<Tip>
+  Prefer the shorthand `<>...</>` over `<React.Fragment>...</React.Fragment>` for brevity. The only time you **must** use the long form is when you need to pass a `key` prop — for example when rendering fragments inside a `.map()` call: `<React.Fragment key={item.id}>`.
+</Tip>

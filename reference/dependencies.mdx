@@ -1,0 +1,67 @@
+---
+title: "Dependencies and Build Tooling Reference"
+sidebarTitle: "Dependencies"
+description: "Full list of runtime dependencies and dev tooling used in Fundamentos React — React 18, Vite 5, React Router v7, Zustand v5, and Tailwind CSS v4."
+---
+
+Fundamentos React is built on a modern, minimal stack: React 18 handles the UI layer, Vite 5 provides the development server and production bundler, React Router v7 manages client-side navigation, Zustand v5 supplies lightweight global state management, and Tailwind CSS v4 delivers utility-first styling. TypeScript tooling is present in dev dependencies so that any `.jsx` file can be graduated to `.tsx` without extra configuration.
+
+## Runtime dependencies
+
+These packages are listed under `"dependencies"` in `package.json` and are required at runtime in the browser.
+
+| Package | Version | Purpose |
+|---|---|---|
+| `@tailwindcss/vite` | `^4.1.12` | Official Tailwind CSS Vite plugin — integrates the Tailwind build directly into the Vite pipeline, eliminating the need for a separate PostCSS step. |
+| `react-router` | `^7.8.1` | Client-side routing library. Provides `BrowserRouter`, `Routes`, `Route`, and related hooks used throughout `App.jsx`. |
+| `tailwindcss` | `^4.1.12` | Utility-first CSS framework. The v4 release is configured entirely through the Vite plugin rather than a `tailwind.config.js` file. |
+| `zustand` | `^5.0.8` | Minimal global state management. Stores are plain functions — no reducers, no boilerplate. Used in `src/context/storeGalleta.jsx`. |
+
+## Dev dependencies
+
+These packages are listed under `"devDependencies"` in `package.json`. They power the development environment, the build process, and optional type checking but are not included in the final browser bundle.
+
+| Package | Version | Purpose |
+|---|---|---|
+| `@types/react` | `^18.2.37` | TypeScript type definitions for React 18 — enables type checking in any `.tsx` component file. |
+| `@types/react-dom` | `^18.2.15` | TypeScript type definitions for `react-dom/client` — types `ReactDOM.createRoot` and related APIs. |
+| `@vitejs/plugin-react` | `^4.2.0` | Official Vite plugin for React. Enables Fast Refresh (HMR) during development and handles the JSX transform via Babel. |
+| `react` | `^18.2.0` | React core library. Ships as a dev dependency because the browser bundle is assembled by Vite at build time. |
+| `react-dom` | `^18.2.0` | React DOM renderer. Provides `ReactDOM.createRoot` used in `src/index.jsx` to mount the app. |
+| `typescript` | `^5.2.2` | TypeScript compiler. Used for type checking only — `"noEmit": true` in `tsconfig.json` means Vite handles all transpilation. |
+| `vite` | `^5.0.0` | Build tool and development server. Serves the app with native ES module support in development and produces an optimized bundle for production. |
+
+## Vite configuration
+
+The project's build and development behaviour is fully defined in a single `vite.config.js` file at the project root.
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  server: {
+    allowedHosts: ['98e93ea5-9538-4ff9-9373-c75809af2597-00-3tonq8itozctu.picard.replit.dev']
+  }
+})
+```
+
+**`react()` plugin** — Provided by `@vitejs/plugin-react`, this plugin enables two key features:
+
+- **Fast Refresh** — React component state is preserved across hot module replacement (HMR) updates during development, so the page does not fully reload on every save.
+- **JSX transform** — Automatically injects the React JSX runtime, so individual component files do not need to `import React from 'react'` at the top.
+
+**`tailwindcss()` plugin** — Provided by `@tailwindcss/vite`, this plugin hooks Tailwind's v4 engine directly into Vite's transform pipeline. It scans component files for utility class usage and generates only the CSS that is actually needed, both during development (via HMR) and in the production build.
+
+**`server.allowedHosts`** — A Vite security setting that restricts which host names the development server will respond to. The value here is the Replit preview URL where this project is hosted. When running locally, this option can be removed or replaced with your own hostname.
+
+<Note>
+  Tailwind CSS v4 takes a fundamentally different configuration approach from v3.
+  There is no `tailwind.config.js` file — all configuration (content paths,
+  theme customisation, plugins) is handled through the `@tailwindcss/vite`
+  plugin and CSS-native `@theme` directives. If you are migrating from a v3
+  project, refer to the [Tailwind CSS v4 upgrade guide](https://tailwindcss.com/docs/upgrade-guide)
+  before copying over your old config file.
+</Note>

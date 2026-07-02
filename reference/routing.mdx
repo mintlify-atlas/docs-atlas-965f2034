@@ -1,0 +1,126 @@
+---
+title: "React Router v7 Route Configuration"
+sidebarTitle: "Routing"
+description: "Fundamentos React uses React Router v7 with BrowserRouter and nested routes. Each concept maps to a distinct path rendered inside the LandingPage Outlet."
+---
+
+Fundamentos React uses **React Router v7** (`react-router`) to map each learning concept to its own URL path. The entire application is wrapped in a `<BrowserRouter>`, and a single parent `<Route path="/">` renders `LandingPage` as the persistent shell. All concept pages are registered as child routes of that parent; React Router renders the matched child into the `<Outlet />` that `LandingPage` provides, so the sidebar navigation remains visible at every path while only the main content area changes.
+
+## Route tree
+
+The full route configuration is defined in `App.jsx`:
+
+```jsx
+import {  BrowserRouter,  Routes,  Route } from "react-router";
+import LandingPage from "./pages/LandingPage";
+import Primero from "./pages/Primero";
+import Segundo from "./pages/Segundo";
+import Tercero from "./pages/Tercero";
+import Cuarto from "./pages/Cuarto";
+import Quinto from "./pages/Quinto";
+import Septimo from "./pages/Septimo";
+import Noveno from "./pages/Noveno";
+import Decimo from "./pages/Decimo";
+
+
+
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+
+        <Route path="/" element={<LandingPage />}>
+          <Route index element={<Primero />} />
+          <Route path="fundamentos" element={<Primero />} />
+          <Route path="usestate" element={<Segundo />} />
+          <Route path="useffect" element={<Tercero />} />
+          <Route path="customhook" element={<Cuarto />} />
+          <Route path="props" element={<Quinto />} />
+          <Route path="zustand" element={<Septimo />} />
+          <Route path="rederizado" element={<Noveno />} />
+          <Route path="localStorage" element={<Decimo />} />
+        </Route>
+
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
+```
+
+## Route table
+
+| Path | Component | Concept |
+|---|---|---|
+| `/` *(index)* or `/fundamentos` | `Primero` | JSX, variables, and events |
+| `/usestate` | `Segundo` | `useState` |
+| `/useffect` | `Tercero` | `useEffect` |
+| `/customhook` | `Cuarto` | Custom Hook |
+| `/props` | `Quinto` | Props |
+| `/zustand` | `Septimo` | Zustand |
+| `/rederizado` | `Noveno` | Conditional & List Rendering |
+| `/localStorage` | `Decimo` | `localStorage` |
+
+## Layout component
+
+`LandingPage` acts as the persistent layout shell for the entire application. It renders a two-column layout: a fixed left sidebar containing the navigation links, and a scrollable right panel that houses `<Outlet />` — the slot where React Router mounts the active child route.
+
+```jsx
+import React from 'react'
+import { Link, Outlet, useLocation } from 'react-router'
+
+const LandingPage = () => 
+{
+
+  const location = useLocation()
+  const urlActual = location.pathname
+
+  return (
+    <div className='md:flex md:min-h-screen'>
+
+      <div className='md:w-1/4 bg-sky-900 px-5 py-10'>
+
+        <h2 className='text-4xl font-black text-center text-white underline'>Fundamentos</h2>
+
+        <nav className='mt-10'>
+
+          <Link to='/fundamentos' className={`${urlActual === '/fundamentos' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>React</Link>
+
+          <Link to='/usestate' className={`${urlActual === '/usestate' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>useState</Link>
+          
+          <Link to='/useffect' className={`${urlActual === '/useffect' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>useEffect</Link>
+          
+          <Link to='/customhook' className={`${urlActual === '/customhook' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>customHook</Link>
+          
+          <Link to='/props' className={`${urlActual === '/props' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>Props</Link>
+          
+          <Link to='/zustand' className={`${urlActual === '/zustand' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>Zustand</Link>
+          
+          <Link to='/rederizado' className={`${urlActual === '/rederizado' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>Renderizado</Link>
+          
+          <Link to='/localstorage' className={`${urlActual === '/localstorage' ? 'text-blue-300 underline' : 'text-white'} text-2xl block mt-2 hover:text-blue-200`}>localStorage</Link>
+          
+        </nav>
+
+      </div>
+
+      <div className='md:w-3/4 p-10 md:h-screen overflow-y-scroll'>
+
+          <Outlet/>
+
+      </div>
+
+    </div>
+  )
+}
+
+export default LandingPage
+```
+
+Active-link highlighting is driven by `useLocation`. On every render, `location.pathname` is captured into `urlActual`. Each `<Link>` compares its target path against `urlActual` and conditionally applies `text-blue-300 underline` when the paths match, falling back to plain `text-white` for inactive links. This approach requires no external active-link library — it uses only the pathname string React Router already provides.
+
+<Note>
+  The rendering concept route is registered as `path="rederizado"` — note the missing `n` compared with the Spanish word *renderizado*. This is an intentional quirk of the current source code. The sidebar `<Link>` in `LandingPage` and the `<Route>` in `App.jsx` both use the same misspelled string, so navigation works correctly. If you rename the route, update **both** files to keep them in sync.
+</Note>

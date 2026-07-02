@@ -1,0 +1,59 @@
+---
+title: "Fundamentos React: Learn React Core Concepts Interactively"
+sidebarTitle: "Introduction"
+description: "Fundamentos React is an interactive learning app covering React's essential building blocks — JSX, hooks, props, global state, and browser APIs — with runnable demos."
+---
+
+Fundamentos React is a hands-on reference app built with React 18, Vite, and Tailwind CSS. Each section of the app isolates a single React concept and pairs it with a live, interactive demo so you can observe the behavior directly in the browser — no extra setup required.
+
+The project covers the concepts that every React developer needs before moving on to production-scale applications:
+
+<CardGroup cols={2}>
+  <Card title="Get Started" icon="rocket" href="/quickstart">
+    Clone the repo, install dependencies, and run the dev server in minutes.
+  </Card>
+  <Card title="JSX & Fragments" icon="code" href="/concepts/jsx-and-fragments">
+    Learn how JSX works, how to use fragments, and how to respond to events.
+  </Card>
+  <Card title="Hooks" icon="bolt" href="/concepts/usestate">
+    Master useState and useEffect — the two hooks you'll use in every component.
+  </Card>
+  <Card title="Props" icon="arrow-right-arrow-left" href="/concepts/props">
+    Pass data from parent to child components using props.
+  </Card>
+  <Card title="Custom Hooks" icon="puzzle-piece" href="/advanced/custom-hooks">
+    Encapsulate reusable logic in a custom hook and share it across components.
+  </Card>
+  <Card title="Zustand" icon="database" href="/advanced/zustand">
+    Manage global state without prop drilling using a lightweight Zustand store.
+  </Card>
+  <Card title="Rendering" icon="layer-group" href="/advanced/rendering">
+    Conditionally show UI and render lists from arrays.
+  </Card>
+  <Card title="localStorage" icon="hard-drive" href="/advanced/localstorage">
+    Persist data across page reloads using the browser's localStorage API.
+  </Card>
+</CardGroup>
+
+## What's inside
+
+The app is structured as a single-page application with a persistent sidebar navigation. Each route renders a self-contained page component that explains the concept with bullet points and demonstrates it with an interactive widget.
+
+| Concept | Route | Component |
+|---|---|---|
+| JSX, variables, events | `/fundamentos` | `Primero` |
+| `useState` | `/usestate` | `Segundo` |
+| `useEffect` | `/useffect` | `Tercero` |
+| Custom Hook (`useFetch`) | `/customhook` | `Cuarto` |
+| Props | `/props` | `Quinto` / `Sexto` |
+| Zustand global store | `/zustand` | `Septimo` / `Octavo` |
+| Conditional & list rendering | `/rederizado` | `Noveno` |
+| `localStorage` | `/localStorage` | `Decimo` |
+
+## Tech stack
+
+- **React 18** — UI library with concurrent rendering support
+- **Vite 5** — fast development server and optimized production builds
+- **React Router v7** — nested routing with `BrowserRouter` and `Outlet`
+- **Zustand v5** — minimal global state management
+- **Tailwind CSS v4** — utility-first CSS via the Vite plugin

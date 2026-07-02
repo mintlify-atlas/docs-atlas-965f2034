@@ -1,0 +1,123 @@
+---
+title: "Building Reusable Logic with Custom Hooks"
+sidebarTitle: "Custom Hooks"
+description: "Custom hooks encapsulate stateful logic so any component can reuse it. Learn how useFetch wraps the Fetch API and returns an async function you call anywhere."
+---
+
+Custom hooks are JavaScript functions whose names start with `use` and that can call other React hooks internally. They let you extract stateful or side-effectful logic out of individual components and share that logic across your entire application without changing the component tree. Instead of duplicating a `fetch` call — with its own loading state, error handling, and `useEffect` — in every component that needs remote data, you write the logic once inside a custom hook and import it wherever it is needed.
+
+## The useFetch hook
+
+The `useFetch` hook lives in `src/customHook/useFecth.js`. It defines an inner async function called `fetchDataBackend`, which accepts a URL, calls the native `fetch` API, parses the JSON response, and returns the parsed data. The hook itself simply returns that function so that any component can store it and invoke it on demand.
+
+```js
+export function useFetch() {
+
+  const fetchDataBackend = async (url) => {
+    try {
+      const request = await fetch(url)
+      const response = await request.json()
+      return response      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
+  return fetchDataBackend
+}
+```
+
+Key points:
+
+- `fetchDataBackend` is declared **inside** the hook, which keeps the async logic scoped and prevents accidental reuse of stale closures.
+- `fetch(url)` returns a `Promise<Response>`. Calling `.json()` on the resolved response parses the body into a plain JavaScript object.
+- The `try/catch` block catches both network errors and JSON-parse failures, logging them to the console so they never silently swallow an exception.
+- Because `useFetch` does not call `useState` or `useEffect` internally, it is a lightweight, stateless wrapper — state management is left to the consuming component.
+
+## Using useFetch in a component
+
+`Cuarto.jsx` demonstrates the typical consumption pattern: call `useFetch()` at the top level of the component to obtain `fetchDataBackend`, then invoke that function inside async event handlers.
+
+```jsx
+
+/*
+
+  1- customHook
+
+*/
+
+import { useState } from "react"
+import { useFetch } from "../customHook/useFecth"
+
+const Cuarto = () => {
+  
+  const [products, setProducts] = useState([])
+  const [memes, setMemes] = useState([])
+  
+  const fetchDataBackend = useFetch()
+
+  const getDataProducts = async()=>{
+    const products = await fetchDataBackend("https://fakestoreapi.com/products")
+    setProducts(products)
+    console.log(products)  
+  }
+  
+  const getDataMemes = async()=>{
+    const memes = await fetchDataBackend("https://api.imgflip.com/get_memes")
+    setMemes(memes)
+    console.log(memes)  
+  }
+
+
+  
+  return (
+    <>
+      <h1 className="font-bold text-2xl">customHook</h1>
+
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+          Es un Hook que permite encapsular lógica reutilizable y que puede ser utilizado en cualquier componente.
+        </li>
+      </ul>
+
+      <div className="flex justify-center mb-8 mt-8">
+
+        <div className="w-120 border rounded-lg p-4 w-80 text-center">
+
+          <h2 className="text-lg font-semibold mb-2 underline">Más información</h2>
+          <p className="mb-3 text-left mb-4"></p>
+          <pre>{JSON.stringify(products[3]?.title)}</pre>
+          <pre>{JSON.stringify(memes.data?.memes[0]?.name)}</pre>
+          
+          <button className="bg-violet-700 text-white py-1 px-3 mx-1 rounded mt-4" onClick={getDataProducts}>Obtener Productos</button>
+          <button className="bg-violet-700 text-white py-1 px-3 rounded" onClick={getDataMemes}>Obtener Memes</button>
+        </div>
+
+      </div>
+
+    </>
+  )
+}
+
+export default Cuarto
+```
+
+Walk-through:
+
+1. **`const fetchDataBackend = useFetch()`** — the hook is called at the top level of `Cuarto`, which is the only place hooks may be called (see the rules below). The returned async function is stored in `fetchDataBackend`.
+2. **`getDataProducts` and `getDataMemes`** — each handler is an `async` arrow function that `await`s `fetchDataBackend` with a different URL. Because `useFetch` is stateless, the same `fetchDataBackend` reference works for every endpoint.
+3. **`setProducts` / `setMemes`** — once the data resolves, local `useState` setters update component state and trigger a re-render to display the results.
+4. **Button `onClick` bindings** — clicking either button fires the corresponding handler; no data is fetched until the user acts, which avoids unnecessary network requests on mount.
+
+## Rules of hooks
+
+React enforces two rules that apply to both built-in hooks and custom hooks:
+
+- **Only call hooks at the top level.** Never call hooks inside loops, conditions, or nested functions. React relies on the order in which hooks are called to associate internal state correctly across renders.
+- **Only call hooks from React functions.** Hooks must be called from a function component or from another custom hook — never from a regular JavaScript utility function or class component.
+
+<Tip>
+Custom hooks **must** begin with the word `use` (e.g. `useFetch`, `useLocalStorage`, `useDebounce`). This naming convention is not just stylistic — React's ESLint plugin (`eslint-plugin-react-hooks`) uses the `use` prefix to identify hook calls and enforce the rules above. A function that calls `useState` but is not named with `use` will not be analysed correctly, and violations will go undetected.
+</Tip>

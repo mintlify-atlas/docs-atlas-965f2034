@@ -1,0 +1,88 @@
+{
+  "projectType": "frontend",
+  "projectName": "Fundamentos React",
+  "projectDescription": "An interactive React fundamentals learning app that demonstrates core concepts — JSX, hooks, props, global state, and browser APIs — through hands-on, runnable examples built with Vite and Tailwind CSS.",
+  "theme": "palm",
+  "primaryColor": "#040404",
+  "lightColor": "#0b7ba3",
+  "darkColor": "#6cc0d7",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guide",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/jsx-and-fragments",
+              "concepts/usestate",
+              "concepts/useeffect",
+              "concepts/props"
+            ]
+          },
+          {
+            "group": "Advanced Topics",
+            "pages": [
+              "advanced/custom-hooks",
+              "advanced/zustand",
+              "advanced/rendering",
+              "advanced/localstorage"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "API Reference",
+            "pages": [
+              "reference/usefetch",
+              "reference/store-galleta",
+              "reference/routing"
+            ]
+          },
+          {
+            "group": "Project",
+            "pages": [
+              "reference/project-structure",
+              "reference/dependencies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Interactive demos for every React fundamental concept",
+    "useState counter with increment, decrement, and reset",
+    "useEffect for side effects and API data fetching",
+    "Custom useFetch hook for reusable async fetch logic",
+    "Props and parent-to-child data passing example",
+    "Zustand global state store with shared state across components",
+    "Conditional rendering and list rendering patterns",
+    "localStorage integration with JSON serialization",
+    "React Router v7 with nested routes and active link highlighting",
+    "Tailwind CSS v4 styling with responsive sidebar layout"
+  ],
+  "publicApiSurface": [
+    "useFetch() — custom hook returning an async fetchDataBackend(url) function",
+    "storeGalleta — Zustand store with detalle state and setGalleta(newGalleta) action",
+    "Routes: /, /fundamentos, /usestate, /useffect, /customhook, /props, /zustand, /rederizado, /localStorage",
+    "Primero — JSX, variables, fragments, conditionals, events",
+    "Segundo — useState counter component",
+    "Tercero — useEffect with API fetch on dependency change",
+    "Cuarto — custom hook usage with external APIs",
+    "Quinto / Sexto — Props parent/child pattern",
+    "Septimo / Octavo — Zustand global state parent/child",
+    "Noveno — Conditional rendering and list rendering",
+    "Decimo — localStorage read/write/remove"
+  ]
+}

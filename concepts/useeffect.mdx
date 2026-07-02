@@ -1,0 +1,105 @@
+---
+title: "Running Side Effects with useEffect"
+sidebarTitle: "useEffect"
+description: "useEffect runs code after render — perfect for API calls, subscriptions, and DOM updates. Learn how dependency arrays control when effects fire."
+---
+
+A **side effect** is any operation that reaches outside the pure render cycle — fetching data from an API, subscribing to a WebSocket, manually manipulating the DOM, or setting a document title. React's render function must remain pure (no side effects directly inside the function body), so `useEffect` provides a dedicated escape hatch. It accepts a callback that React runs *after* the component has painted to the screen, keeping your UI responsive. An optional cleanup function can be returned from the callback to tear down subscriptions or cancel pending requests when the component unmounts or before the effect re-runs.
+
+## Hook signature
+
+```tsx
+useEffect(() => {
+  // effect
+  return () => { /* cleanup */ }
+}, [dependency])
+```
+
+- The **first argument** is the effect callback. Any value it returns must be a cleanup function (or nothing).
+- The **second argument** is the dependency array, which controls when the effect re-runs.
+- The **cleanup function** (the return value) runs before the next invocation of the same effect and when the component unmounts — it is the right place to cancel fetches, clear timers, or unsubscribe from event listeners.
+
+## Dependency array behavior
+
+| Dependency array | When the effect runs |
+|---|---|
+| `[]` — empty array | Once, immediately after the component **mounts**. Equivalent to `componentDidMount` in class components. |
+| `[dep]` — one or more specific dependencies | On mount **and** whenever any listed dependency changes between renders. |
+| *(no array)* | After **every** render. Use sparingly — it is rarely what you want and can cause infinite loops if the effect itself updates state. |
+
+## API fetch demo
+
+The `Tercero` component fetches a random user from the [JSONPlaceholder](https://jsonplaceholder.typicode.com) API and displays their profile. The state variable `buscar` acts as a manual trigger: placing it in the dependency array means the effect re-runs — and a fresh random user is fetched — every time `buscar` changes. Because the demo currently mounts with `buscar` set to `1` and never calls `setBuscar`, the fetch fires exactly once on mount. Extending the UI with a "Buscar otro" button that increments `buscar` would immediately trigger another fetch without any extra wiring.
+
+```jsx
+/*
+
+  1- useEffect
+
+*/
+
+
+import { useEffect, useState } from "react"
+
+const Tercero = () => {
+
+  const [user, setUser] = useState({})
+  
+  const [buscar, setBuscar] = useState(1)
+
+  const getUserIDApi = async() =>
+  {
+    const id = Math.floor(Math.random()*10)+1
+    const request = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
+    const response = await request.json()
+    console.log(response)
+    setUser(response)
+  }
+  
+  useEffect(()=>{
+    
+    getUserIDApi()
+  
+  },[buscar])
+
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">useEffect</h1>
+
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+          Es un Hook que permite ejecutar efectos secundarios, como peticiones a APIs o actualizar el DOM.
+        </li>
+      </ul>
+
+      <div className="flex justify-center mb-8 mt-8">
+
+        <div className="w-120 border rounded-lg p-4 w-80 text-center">
+
+          <h2 className="text-lg font-semibold mb-2">Bienvenido(a) - {user.name}</h2>
+
+          <p className="mb-3 text-left">username: {user.username}</p>
+          <p className="mb-3 text-left">email: {user.email}</p>
+          <p className="mb-3 text-left">phone: {user.phone}</p>
+          <p className="mb-3 text-left">address: {user.address?.country}</p>
+          <p className="mb-3 text-left">location: {user.address?.geolo?.latitude ?? "N/A"}</p>
+          
+        </div>
+
+      </div>
+
+    </>
+  )
+}
+
+export default Tercero
+```
+
+Notice that `getUserIDApi` is defined inside the component. When you define an async helper inside the effect or the component body and reference it from the effect, the React linting rules (`eslint-plugin-react-hooks`) will ask you to add it to the dependency array or move it inside the effect callback. Keeping the function inside the `useEffect` callback itself is the safest pattern for one-off fetch calls, as it avoids the dependency entirely.
+
+<Warning>
+  **Missing dependencies cause stale closures.** If your effect reads a prop or state variable but you omit it from the dependency array, the effect will "close over" the value as it was on the first render and never see updates. This is one of the most common bugs in React applications. Always use the `exhaustive-deps` ESLint rule from `eslint-plugin-react-hooks` — it will warn you about missing dependencies before they become runtime bugs. If adding a dependency would cause an infinite loop, that is usually a sign the effect logic itself needs to be restructured (e.g. moving the function inside the effect, or memoising it with `useCallback`).
+</Warning>

@@ -1,0 +1,147 @@
+---
+title: "Passing Data Between Components with Props"
+sidebarTitle: "Props"
+description: "Props are React's mechanism for passing data from a parent component to its children. Learn the pattern with a real parent-child example from the source."
+---
+
+Props (short for *properties*) are the primary way React components communicate. A parent component owns a piece of data — an object, a string, a number, a callback function — and passes it down to a child component as an attribute in JSX. The child receives all of its props bundled into a single plain JavaScript object and can read any field it needs. Props flow in one direction only: from parent to child. This one-way data flow makes it straightforward to trace where every piece of data in your UI comes from.
+
+## How props work
+
+The parent is the sole owner and source of truth for the data. It declares a value in its own scope and forwards it to the child as a JSX attribute:
+
+```jsx
+<ChildComponent propName={value} />
+```
+
+React collects all such attributes into a plain object and passes it as the **first argument** of the child's function. The child reads the data from that argument — it cannot modify the original value, it can only display or derive new values from what it receives. This immutability guarantee keeps your data flow predictable and your components easy to reason about.
+
+## Parent component
+
+`Quinto.jsx` owns the `userProfile` object and renders `Sexto` passing the entire object as the `data` prop.
+
+```jsx
+/*
+
+  1- Props 
+
+*/
+
+import Sexto from "./Sexto"
+
+
+const Quinto = () => {
+
+  const userProfile = {
+    name: "Matew",
+    rol: "Employee",
+    email: "matew@gmail.com",
+  }
+
+  return (
+    <>
+      <h1 className="font-bold text-2xl">Props</h1>
+
+      <hr className="border-gray-400 mb-8"/>
+
+      <ul className="list-disc pl-5">
+        <li>
+          Permiten pasar datos de un componente padre a un hijo.
+        </li>
+      </ul>
+      
+      <h2 className="text-green-700 text-center mt-8">Padre</h2>
+      
+      <div className="border-2 border-green-500 flex-colum justify-center items-center w-120 mx-auto mb-8">
+    
+        <Sexto data={userProfile}/>
+        
+      </div>
+    
+    </>
+  )
+}
+
+export default Quinto
+```
+
+## Child component
+
+`Sexto.jsx` receives the `data` prop and renders each field. It has no knowledge of where `data` comes from — it simply reads `data.name`, `data.rol`, and `data.email`.
+
+```jsx
+/*
+
+  1- Props 
+
+*/
+
+
+const Sexto = ({data}) => {
+
+
+  return (
+    <>
+
+      <h2 className="text-orange-800">Hijo</h2>
+      
+      <div className="flex justify-center mb-8">
+        
+        <div className="max-w-sm border-2 border-orange-500 rounded-lg p-4 w-80 text-center">
+          
+          <h2 className="text-lg font-semibold mb-2">Bienvenido(a) - {data.name}</h2>
+
+          <p className="mb-3">rol: {data.rol}</p>
+          
+          <p className="mb-3">email: {data.email}</p>
+        
+        </div>
+
+      </div>
+
+    </>
+  )
+}
+
+export default Sexto
+```
+
+## Destructuring props
+
+React passes all props as a single object to the child function. Instead of naming that argument `props` and writing `props.data`, `Sexto` uses **destructuring** in the function signature to extract only what it needs:
+
+```jsx
+const Sexto = ({ data }) => {
+  // data.name  → "Matew"
+  // data.rol   → "Employee"
+  // data.email → "matew@gmail.com"
+}
+```
+
+This is idiomatic React and keeps the component body clean. You can go one level deeper and destructure the nested fields as well:
+
+```jsx
+const Sexto = ({ data: { name, rol, email } }) => {
+  // name, rol, and email are now available as direct variables
+}
+```
+
+<Tip>
+  In a TypeScript project, define an interface for your props to get full type-safety and editor auto-complete. For `Sexto` it would look like this:
+
+  ```tsx
+  interface Props {
+    data: {
+      name: string
+      rol: string
+      email: string
+    }
+  }
+
+  const Sexto = ({ data }: Props) => {
+    // TypeScript now knows the shape of data
+  }
+  ```
+
+  Typing props surfaces mistakes at compile time — for example, passing a number where a string is expected — long before the bug reaches the browser.
+</Tip>
